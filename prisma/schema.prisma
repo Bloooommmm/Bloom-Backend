@@ -5,3 +5,122 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model MsAchievement { 
+  achievement_id   String      @id @default(uuid())
+  code             String      @unique
+  title            String 
+  icon_key         String
+  description      String
+  published        Boolean
+  userAchievements trUserAchievement[]
+}
+
+model MsUser {
+  user_id         String      @id @default(uuid())
+  firebase_uid    String      @unique
+  display_name    String
+  email           String      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  achievements trUserAchievement[]
+  lessonProgress TriLessonProgress[]
+  challengeAttemps  TrChallengeAttempt[]
+}
+
+
+model trUserAchievement {
+  user_id         String    
+  achievement_id  String    
+  earned_at       String
+
+  @@id([user_id, achievement_id])
+  user MsUser @relation(fields: [user_id], references: [user_id])
+  achievement MsAchievement @relation(fields: [achievement_id], references: [achievement_id])
+}
+
+model MsUnit { 
+  unit_id       String        @id @default(uuid())
+  title         String        
+  description   String
+  order_index   String
+  published     Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lessons MsLesson[]
+}
+
+model MsLesson {
+  lesson_id         String  @id @default(uuid())
+  unit_id           String
+  title             String
+  summary           String
+  estimated_minutes Int
+  order_index       Int
+  published         Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  unis MsUnit @relation(fields: [unit_id], references: [unit_id])
+  lessonProgress TriLessonProgress[]
+  challenges MsChallenge[]
+  contentBlock MsContentBlock[]
+}
+
+model TriLessonProgress { 
+  progress_id        String  @id @default(uuid())
+  lesson_id          String
+  user_id            String 
+  status             String
+  score              Decimal
+  user MsUser @relation(fields: [user_id], references: [user_id])
+  lessons MsLesson @relation(fields: [lesson_id], references: [lesson_id])
+  started_at        DateTime
+  complete_at       DateTime
+  update_at         DateTime  @updatedAt
+}
+
+model MsContentBlock {
+  block_id          String  @id @default(uuid())
+  lesson_id         String
+  block_type        String
+  body              Json
+  order_index       Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson MsLesson @relation(fields: [lesson_id], references: [lesson_id])
+}
+
+model MsChallenge { 
+  challenge_id      String  @id @default(uuid())
+  lesson_id         String
+  challenge_type    String
+  question          String
+  question_media    Json
+  option            Json
+  order_index       Int
+  explanation       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson MsLesson   @relation(fields: [lesson_id], references: [lesson_id])
+  key MsChallengeKey?
+  challengeAttemps  TrChallengeAttempt[]
+}
+
+model MsChallengeKey { 
+  challenge_id     String @id
+  answer_key       Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
+  challenge MsChallenge @relation(fields: [challenge_id], references: [challenge_id])
+}
+
+model TrChallengeAttempt {
+  attempt_id          String @id
+  user_id             String
+  challenge_id        String
+  selected_option_id  String
+  is_correct          Boolean
+  createdAt DateTime @default(now())
+  user MsUser @relation(fields: [user_id], references: [user_id])
+  challenge MsChallenge @relation(fields: [challenge_id], references: [challenge_id])
+}
