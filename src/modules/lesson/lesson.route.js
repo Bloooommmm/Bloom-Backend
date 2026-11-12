@@ -1,13 +1,12 @@
-import { Router } from 'express';
-import { LessonService } from './lesson.service.js';
-import { LessonController } from './lesson.controller.js';
+import express from 'express';
+import { lessonController } from '../controllers/lesson.controller';
 
-const router = Router({ mergeParams: true });
+const router = express.Router();
 
-const lessonService = new LessonService();
-const lessonController = new LessonController(lessonService);
+router.post('/', lessonController.create);
+router.get('/', lessonController.getAll);
+router.get('/:slug', lessonController.getBySlug);
+router.patch('/:id', lessonController.update);
+router.delete('/:id', lessonController.delete);
 
-router.get('/', lessonController.getByUnitId);
-router.get('/:id', lessonController.getById);
-
-export default router;
+module.exports = router;
