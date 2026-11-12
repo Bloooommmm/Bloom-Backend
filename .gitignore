@@ -4,3 +4,4 @@
 .cursor
 .devin
 /node_modules
+/prisma/migrations
