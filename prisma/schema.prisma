@@ -107,7 +107,7 @@ model MsChallenge {
 }
 
 model MsChallengeKey { 
-  challenge_id     String @id
+  challenge_id     String @id @default(uuid())
   answer_key       Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
@@ -115,7 +115,7 @@ model MsChallengeKey {
 }
 
 model TrChallengeAttempt {
-  attempt_id          String @id
+  attempt_id          String @id @default(uuid())
   user_id             String
   challenge_id        String
   selected_option_id  String
