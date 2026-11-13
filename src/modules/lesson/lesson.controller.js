@@ -23,7 +23,7 @@ const lessonController = {
   async getBySlug(req, res) {
     try {
       const lesson = await lessonService.getLessonBySlug(req.params.slug);
-      if (!lesson) return res.status(404).json({ success: false, message: 'Lesson tidak ditemukan' });
+      if (!lesson) return res.status(404).json({ success: false, message: 'Lesson is not found' });
       res.json({ success: true, data: lesson });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -42,7 +42,7 @@ const lessonController = {
   async delete(req, res) {
     try {
       await lessonService.deleteLesson(req.params.id);
-      res.json({ success: true, message: 'Lesson berhasil dihapus' });
+      res.json({ success: true, message: 'Lesson successfully deleted' });
     } catch (error) {
       res.status(400).json({ success: false, message: error.message });
     }

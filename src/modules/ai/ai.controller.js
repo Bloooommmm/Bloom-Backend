@@ -8,7 +8,7 @@ const aiController = {
       if (!mood || !symptoms) {
         return res.status(400).json({
           success: false,
-          message: 'Field mood dan symptoms wajib diisi',
+          message: 'Field mood dan symptoms is required',
         });
       }
 
@@ -26,7 +26,7 @@ const aiController = {
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Gagal menghasilkan penjelasan AI: ' + error.message,
+        message: 'Failed to get result from AI' + error.message,
       });
     }
   },

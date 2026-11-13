@@ -19,7 +19,7 @@ app.use('/api/ai', aiRoutes);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} tidak ditemukan`,
+    message: `Route ${req.originalUrl} is not found`,
   });
 });
 
