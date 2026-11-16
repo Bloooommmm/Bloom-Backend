@@ -77,6 +77,16 @@ npm run typecheck
 npm run build
 npm run lint
 npm test
+npm run docs:validate
 ```
 
 The request logger is mounted globally and redacts sensitive request and response fields before printing them.
+
+## API documentation
+
+After starting the backend, open:
+
+- Swagger UI: `http://localhost:3000/api/docs`
+- OpenAPI JSON: `http://localhost:3000/api/docs/openapi.json`
+
+The specification documents every current route, request body, path/query parameter, success response, error response, and reusable schema. It is served directly by the API, so the documentation stays versioned with the backend.

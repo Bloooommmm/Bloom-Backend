@@ -1,5 +1,7 @@
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import { corsMiddleware } from "./config/index.js";
+import { openapiDocument } from "./docs/index.js";
 import { errorHandler, requestLogger } from "./middleware/index.js";
 import { aiRouter, lessonRouter, userRouter } from "./modules/index.js";
 
@@ -8,6 +10,14 @@ const app = express();
 app.use(corsMiddleware);
 app.use(requestLogger);
 app.use(express.json());
+
+app.get("/api/docs/openapi.json", (_req, res) => {
+  res.json(openapiDocument);
+});
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiDocument, {
+  customSiteTitle: "Bloom API Documentation",
+  swaggerOptions: { validatorUrl: null, displayRequestDuration: true },
+}));
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ success: true, data: { status: "ok", service: "bloom-backend" } });
