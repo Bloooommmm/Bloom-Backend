@@ -1,11 +1,5 @@
 # Bloom Backend
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Bloooommmm/.github/main/profile/assets/bloom-logo.svg" alt="Bloom" width="220">
-  <br>
-  <img src="https://raw.githubusercontent.com/Bloooommmm/.github/main/profile/assets/bloom-mascot.png" alt="Bloom's pink sprout mascot" width="120">
-</p>
-
 An Express API for Bloom, a supportive period-tracking and menstrual-health learning app.
 
 [Android app](https://github.com/Bloooommmm/Bloom-Frontend) | [Live Swagger](https://bloom-be.yanzz.dev/api/docs) | [Organization](https://github.com/Bloooommmm)
