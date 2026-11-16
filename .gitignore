@@ -4,4 +4,10 @@
 .cursor
 .devin
 /node_modules
-/prisma/migrations
+/node_modules.incomplete
+/dist
+/src/generated
+.env.*
+!.env.example
+.env.*
+!.env.example
