@@ -27,7 +27,7 @@ export const openapiDocument = {
     title: "Bloom API",
     version: "1.0.0",
     description:
-      "REST API for Bloom: profiles, cycle education, and AI insights. All endpoints currently have no authentication or role guards. User endpoints are profile CRUD, not registration or login. Optional passwords are currently stored without hashing; use dummy data only. Lists are unpaginated. DELETE returns 204 with no body. Swagger describes supported payloads; it does not add runtime validation. Malformed JSON and unexpected provider/database failures currently return 500.",
+      "REST API for Bloom: profiles, cycle education, and AI insights. Firebase ID token is required for /api/users/me. The endpoint creates or updates the current user profile. Swagger describes supported payloads; it does not add runtime validation. Malformed JSON and unexpected provider/database failures currently return 500.",
     contact: {
       name: "Bloom Team",
       url: "https://github.com/Bloooommmm/Bloom-Backend",
@@ -55,75 +55,19 @@ export const openapiDocument = {
         },
       },
     },
-    "/api/users": {
-      post: {
-        tags: ["Users"],
-        summary: "Create a user",
-        operationId: "createUser",
-        description: "Email is trimmed and lowercased. Name is trimmed. Unknown fields are ignored. Password is optional and is never returned.",
-        requestBody: {
-          required: true,
-          content: json(ref("CreateUserRequest")),
-        },
-        responses: {
-          "201": success(ref("UserResponse"), "User created."),
-          "400": errorResponse("A valid email is required"),
-          "409": errorResponse("Resource already exists"),
-          ...serverError,
-        },
-      },
+    "/api/users/me": {
       get: {
         tags: ["Users"],
-        summary: "List users",
-        operationId: "listUsers",
-        description: "Returns all user profiles ordered by createdAt descending. No pagination or filters; meta.total is the returned array length.",
+        summary: "Get or create current Firebase user profile",
+        operationId: "getCurrentUser",
+        security: [{ firebaseBearer: [] }],
         responses: {
-          "200": success(ref("UserListResponse"), "Users returned."),
+          "200": success(ref("UserResponse"), "Current user profile returned."),
+          "401": errorResponse("Invalid or expired Firebase token"),
           ...serverError,
         },
       },
-    },
-    "/api/users/{id}": {
-      parameters: [{ $ref: "#/components/parameters/Id" }],
-      get: {
-        tags: ["Users"],
-        summary: "Get a user",
-        operationId: "getUser",
-        responses: {
-          "200": success(ref("UserResponse"), "User returned."),
-          "404": errorResponse("User is not found"),
-          ...serverError,
-        },
-      },
-      patch: {
-        tags: ["Users"],
-        summary: "Update a user",
-        operationId: "updateUser",
-        description: "Updates only supplied email, name, and password fields. An empty object is accepted. Null/non-string name and password values are ignored; null email returns 400.",
-        requestBody: {
-          required: true,
-          content: json(ref("UpdateUserRequest")),
-        },
-        responses: {
-          "200": success(ref("UserResponse"), "User updated."),
-          "400": errorResponse("A valid email is required"),
-          "404": errorResponse("Resource is not found"),
-          "409": errorResponse("Resource already exists"),
-          ...serverError,
-        },
-      },
-      delete: {
-        tags: ["Users"],
-        summary: "Delete a user",
-        operationId: "deleteUser",
-        responses: {
-          "204": { description: "User deleted." },
-          "404": errorResponse("Resource is not found"),
-          ...serverError,
-        },
-      },
-    },
-    "/api/lessons": {
+    },    "/api/lessons": {
       post: {
         tags: ["Lessons"],
         summary: "Create a lesson",
@@ -231,6 +175,7 @@ export const openapiDocument = {
     },
   },
   components: {
+    securitySchemes: { firebaseBearer: { type: "http", scheme: "bearer", bearerFormat: "Firebase ID token" } },
     parameters: {
       Id: {
         name: "id",
@@ -390,3 +335,4 @@ export const openapiDocument = {
     },
   },
 } as const;
+

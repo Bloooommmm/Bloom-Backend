@@ -11,6 +11,7 @@ datasource db {
 model MsUser {
   id        String   @id @default(cuid())
   email     String   @unique
+  firebaseUid String? @unique
   name      String?
   password  String?  
   

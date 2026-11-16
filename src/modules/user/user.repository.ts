@@ -1,6 +1,6 @@
 import { prisma } from "../../config/index.js";
 
-const publicUser = { id: true, email: true, name: true, createdAt: true, updatedAt: true } as const;
+const publicUser = { id: true, email: true, name: true, firebaseUid: true, createdAt: true, updatedAt: true } as const;
 
 export const userRepository = {
   create(data: { email: string; name?: string; password?: string }) {
@@ -17,5 +17,8 @@ export const userRepository = {
   },
   delete(id: string) {
     return prisma.msUser.delete({ where: { id } });
+  },
+  upsertFirebase(data: { firebaseUid: string; email: string; name?: string }) {
+    return prisma.msUser.upsert({ where: { firebaseUid: data.firebaseUid }, create: data, update: { email: data.email, name: data.name }, select: publicUser });
   },
 };

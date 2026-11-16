@@ -7,6 +7,10 @@ function requireEmail(value: unknown): string {
 }
 
 export const userService = {
+  upsertFirebase(data: { firebaseUid: string; email?: string; name?: string }) {
+    if (!data.email) throw new AppError("Firebase account email is required", 400);
+    return userRepository.upsertFirebase({ firebaseUid: data.firebaseUid, email: data.email.toLowerCase(), name: data.name });
+  },
   create(data: { email?: unknown; name?: unknown; password?: unknown }) {
     const email = requireEmail(data.email);
     return userRepository.create({ email, name: typeof data.name === "string" ? data.name.trim() : undefined, password: typeof data.password === "string" ? data.password : undefined });

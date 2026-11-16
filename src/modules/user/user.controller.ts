@@ -20,4 +20,8 @@ export const userController = {
     await userService.delete(String(req.params.id));
     res.status(204).send();
   },
+  async me(req: Request, res: Response) {
+    const identity = req.firebaseUser!;
+    res.json(singleResponse(await userService.upsertFirebase({ firebaseUid: identity.uid, email: identity.email, name: identity.name })));
+  },
 };

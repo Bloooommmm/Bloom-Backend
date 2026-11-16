@@ -11,4 +11,6 @@ export const env = {
   corsOrigin: process.env.CORS_ORIGIN ?? "*",
   databaseUrl: required("DATABASE_URL"),
   groqApiKey: process.env.GROQ_API_KEY,
+  firebaseServiceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
+  firebaseServiceAccountJson: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
 };

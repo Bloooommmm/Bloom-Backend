@@ -1,11 +1,9 @@
 import { Router } from "express";
 import { asyncHandler } from "../../utils/index.js";
 import { userController } from "./user.controller.js";
+import { firebaseAuth } from "../../middleware/index.js";
 
 const router = Router();
-router.post("/", asyncHandler(userController.create));
-router.get("/", asyncHandler(userController.list));
-router.get("/:id", asyncHandler(userController.get));
-router.patch("/:id", asyncHandler(userController.update));
-router.delete("/:id", asyncHandler(userController.delete));
+router.use(firebaseAuth);
+router.get("/me", asyncHandler(userController.me));
 export default router;
