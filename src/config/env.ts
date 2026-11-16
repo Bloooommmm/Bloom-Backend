@@ -13,4 +13,5 @@ export const env = {
   groqApiKey: process.env.GROQ_API_KEY,
   firebaseServiceAccountPath: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
   firebaseServiceAccountJson: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
+  firebaseProjectId: process.env.FIREBASE_PROJECT_ID ?? "bloom-a611e",
 };
