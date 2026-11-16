@@ -1,92 +1,93 @@
 # Bloom Backend
 
-Bloom Backend is the REST API for the Bloom menstrual-cycle companion. It serves user profiles, educational lessons, and optional AI-generated cycle insights for the Android client.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Bloooommmm/.github/main/profile/assets/bloom-logo.svg" alt="Bloom" width="220">
+  <br>
+  <img src="https://raw.githubusercontent.com/Bloooommmm/.github/main/profile/assets/bloom-mascot.png" alt="Bloom's pink sprout mascot" width="120">
+</p>
+
+An Express API for Bloom, a supportive period-tracking and menstrual-health learning app.
+
+[Android app](https://github.com/Bloooommmm/Bloom-Frontend) | [Live Swagger](https://bloom-be.yanzz.dev/api/docs) | [Organization](https://github.com/Bloooommmm)
 
 ## Stack
 
 - Node.js 22+
-- TypeScript with strict ESM and NodeNext resolution
-- Express 5
-- PostgreSQL and Prisma 7 with `@prisma/adapter-pg`
-- Groq SDK for optional AI insights
-- Docker Compose for local PostgreSQL
+- TypeScript, Express 5, and strict ESM
+- PostgreSQL with Prisma 7 and `@prisma/adapter-pg`
+- Firebase Admin bearer-token authentication
+- Groq for optional cycle insights
+- Swagger UI and OpenAPI
 
 ## Architecture
 
 ```text
-Bloom-Backend/
-├── prisma/              schema, migrations, and seed data
-├── src/
-│   ├── config/          environment, CORS, and Prisma client
-│   ├── middleware/      request logger and error handler
-│   ├── modules/         user, lesson, and ai domains
-│   ├── utils/           response helpers and async route wrapper
-│   ├── app.ts            Express composition without opening a port
-│   └── index.ts          HTTP process entry point
-├── compose.yaml
-└── package.json
+src/
+├── config/       environment, CORS, Prisma client
+├── middleware/   Firebase auth, request logger, error handler
+├── modules/      users, lessons, tracking, AI insights
+├── utils/        response helpers and async route wrapper
+├── app.ts        Express composition
+└── index.ts      HTTP entry point
+prisma/           schema, migrations, seed data
 ```
 
-Each domain follows `route -> controller -> service -> repository` where a repository adds a useful database boundary. Responses use a consistent `{ success, data }` envelope; list endpoints also include `meta.total`.
+Domain modules follow `route -> controller -> service -> repository`. Database tables use the project naming convention: `MsUser`, `MsLesson`, `TrPeriod`, and `TrMood`.
 
 ## API
 
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/health` | Liveness check |
-| POST | `/api/users` | Create a user |
-| GET | `/api/users` | List users |
-| GET | `/api/users/:id` | Get one user |
-| PATCH | `/api/users/:id` | Update a user |
-| DELETE | `/api/users/:id` | Delete a user |
-| POST | `/api/lessons` | Create a lesson |
-| GET | `/api/lessons` | List published lessons |
-| GET | `/api/lessons?all=true` | List all lessons |
-| GET | `/api/lessons/:slug` | Get a lesson by slug |
-| PATCH | `/api/lessons/:id` | Update a lesson |
-| DELETE | `/api/lessons/:id` | Delete a lesson |
-| POST | `/api/ai/insight` | Generate a cycle insight with Groq |
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/health` | No | Health check |
+| GET | `/api/docs` | No | Swagger UI |
+| GET | `/api/docs/openapi.json` | No | OpenAPI document |
+| GET | `/api/users/me` | Firebase | Sync and return the current user |
+| GET | `/api/lessons` | No | List published lessons |
+| GET | `/api/lessons/:slug` | No | Read one lesson |
+| POST | `/api/lessons` | No | Create a lesson |
+| PATCH | `/api/lessons/:id` | No | Update a lesson |
+| DELETE | `/api/lessons/:id` | No | Delete a lesson |
+| GET | `/api/tracking/periods` | Firebase | List the current user's periods |
+| POST | `/api/tracking/periods` | Firebase | Log a period start |
+| PATCH | `/api/tracking/periods/:id` | Firebase | Set a period end date |
+| DELETE | `/api/tracking/periods/:id` | Firebase | Delete a period record |
+| GET | `/api/tracking/moods` | Firebase | List daily moods |
+| PUT | `/api/tracking/moods` | Firebase | Create or update a daily mood |
+| POST | `/api/ai/insight` | Firebase | Generate a supportive cycle insight |
 
-The AI route requires `GROQ_API_KEY`. Authentication and password hashing are not implemented yet; the current user model is for the initial API contract.
+Send the Firebase ID token as `Authorization: Bearer <token>` on protected routes. The API does not diagnose medical conditions.
+
+Lesson writes currently have no authentication middleware. The Android app only reads lessons. List all lessons, including drafts, with `GET /api/lessons?all=true`.
 
 ## Local setup
 
 ```powershell
 Copy-Item .env.example .env
-npm install
+npm ci
 npm run db:up
-npm run db:generate
-npm run prisma:migrate -- --name init
+npm run prisma:generate
+npm run prisma:migrate:deploy
 npm run prisma:seed
 npm run dev
 ```
 
-The API starts at `http://localhost:3000`. PostgreSQL is exposed at port `5433` by Compose. `npm run db:down` stops the container while keeping the `postgres_data` volume.
+The API runs at `http://localhost:3000`. Docker PostgreSQL runs on port `5433` by default.
 
-For a deployment database, run `npm run prisma:migrate:deploy` instead of the development migration command.
+For production, set `DATABASE_URL`, `FIREBASE_PROJECT_ID`, and either `FIREBASE_SERVICE_ACCOUNT_JSON` or `FIREBASE_SERVICE_ACCOUNT_PATH`. Keep credentials in a secret manager; never commit `.env` or service-account files.
 
-## Environment
-
-Copy `.env.example` to `.env` and set the database URL for your environment. Use a secret manager for production credentials. Never commit `.env` or API keys.
+`PORT` defaults to 3000. `CORS_ORIGIN` controls allowed origins. Set `GROQ_API_KEY` only when using AI insights. Use `npm run prisma:migrate -- --name your_change` to create a migration after changing the schema; deployments apply committed migrations with `prisma:migrate:deploy`.
 
 ## Verification
 
 ```powershell
 npm run db:validate
 npm run typecheck
-npm run build
 npm run lint
 npm test
+npm run build
 npm run docs:validate
 ```
 
-The request logger is mounted globally and redacts sensitive request and response fields before printing them.
+## Deployment
 
-## API documentation
-
-After starting the backend, open:
-
-- Swagger UI: `http://localhost:3000/api/docs`
-- OpenAPI JSON: `http://localhost:3000/api/docs/openapi.json`
-
-The specification documents every current route, request body, path/query parameter, success response, error response, and reusable schema. It is served directly by the API, so the documentation stays versioned with the backend.
+The `main` branch runs CI, then triggers the configured Coolify deployment through GitHub Actions. Configure `COOLIFY_WEBHOOK_URL` and `COOLIFY_API_TOKEN` as repository secrets.

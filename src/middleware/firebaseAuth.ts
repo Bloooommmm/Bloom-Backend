@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { verifyFirebaseToken } from "../config/index.js";
 
-declare global {
-  namespace Express { interface Request { firebaseUser?: { uid: string; email?: string; name?: string } } }
+declare module "express-serve-static-core" {
+  interface Request { firebaseUser?: { uid: string; email?: string; name?: string } }
 }
 
 export async function firebaseAuth(req: Request, res: Response, next: NextFunction) {
