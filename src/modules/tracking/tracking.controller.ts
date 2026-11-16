@@ -7,6 +7,7 @@ export const trackingController = {
   async periods(req: Request, res: Response) { res.json(listResponse(await trackingService.periods(await userId(req)))); },
   async createPeriod(req: Request, res: Response) { res.status(201).json(singleResponse(await trackingService.createPeriod(await userId(req), req.body))); },
   async finishPeriod(req: Request, res: Response) { res.json(singleResponse(await trackingService.finishPeriod(await userId(req), String(req.params.id), req.body))); },
+  async deletePeriod(req: Request, res: Response) { res.json(singleResponse(await trackingService.deletePeriod(await userId(req), String(req.params.id)))); },
   async moods(req: Request, res: Response) { res.json(listResponse(await trackingService.moods(await userId(req)))); },
   async upsertMood(req: Request, res: Response) { res.json(singleResponse(await trackingService.upsertMood(await userId(req), req.body))); },
 };
