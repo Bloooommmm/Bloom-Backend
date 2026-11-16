@@ -9,7 +9,10 @@ function requireEmail(value: unknown): string {
 export const userService = {
   upsertFirebase(data: { firebaseUid: string; email?: string; name?: string }) {
     if (!data.email) throw new AppError("Firebase account email is required", 400);
-    return userRepository.upsertFirebase({ firebaseUid: data.firebaseUid, email: data.email.toLowerCase(), name: data.name });
+    const email = data.email.toLowerCase();
+    return userRepository.findByEmail(email).then((existing) => existing
+      ? userRepository.attachFirebase(existing.id, { firebaseUid: data.firebaseUid, name: data.name })
+      : userRepository.upsertFirebase({ firebaseUid: data.firebaseUid, email, name: data.name }));
   },
   create(data: { email?: unknown; name?: unknown; password?: unknown }) {
     const email = requireEmail(data.email);

@@ -21,4 +21,8 @@ export const userRepository = {
   upsertFirebase(data: { firebaseUid: string; email: string; name?: string }) {
     return prisma.msUser.upsert({ where: { firebaseUid: data.firebaseUid }, create: data, update: { email: data.email, name: data.name }, select: publicUser });
   },
+  findByEmail(email: string) { return prisma.msUser.findUnique({ where: { email }, select: publicUser }); },
+  attachFirebase(id: string, data: { firebaseUid: string; name?: string }) {
+    return prisma.msUser.update({ where: { id }, data, select: publicUser });
+  },
 };

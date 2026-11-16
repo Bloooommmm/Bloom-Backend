@@ -42,6 +42,7 @@ export const openapiDocument = {
     { name: "Users", description: "User profile operations" },
     { name: "Lessons", description: "Cycle education content" },
     { name: "AI", description: "Supportive cycle insight generation" },
+    { name: "Tracking", description: "Authenticated period and mood records" },
   ],
   paths: {
     "/health": {
@@ -67,7 +68,16 @@ export const openapiDocument = {
           ...serverError,
         },
       },
-    },    "/api/lessons": {
+    },
+    "/api/tracking/periods": {
+      get: { tags: ["Tracking"], summary: "List current user's period records", operationId: "listPeriods", security: [{ firebaseBearer: [] }], responses: { "200": success({ type: "object" }, "Period records returned."), "401": errorResponse("Invalid or expired Firebase token"), ...serverError } },
+      post: { tags: ["Tracking"], summary: "Record a period", operationId: "createPeriod", security: [{ firebaseBearer: [] }], requestBody: { required: true, content: json({ type: "object", required: ["startDate"], properties: { startDate: { type: "string", format: "date" }, endDate: { type: "string", format: "date" } } }) }, responses: { "201": success({ type: "object" }, "Period recorded."), "400": errorResponse("A valid date is required"), "401": errorResponse("Invalid or expired Firebase token"), ...serverError } },
+    },
+    "/api/tracking/moods": {
+      get: { tags: ["Tracking"], summary: "List current user's moods", operationId: "listMoods", security: [{ firebaseBearer: [] }], responses: { "200": success({ type: "object" }, "Mood records returned."), "401": errorResponse("Invalid or expired Firebase token"), ...serverError } },
+      put: { tags: ["Tracking"], summary: "Record a daily mood", operationId: "upsertMood", security: [{ firebaseBearer: [] }], requestBody: { required: true, content: json({ type: "object", required: ["mood", "loggedAt"], properties: { mood: { type: "string" }, note: { type: "string" }, loggedAt: { type: "string", format: "date" } } }) }, responses: { "200": success({ type: "object" }, "Mood recorded."), "400": errorResponse("Mood is required"), "401": errorResponse("Invalid or expired Firebase token"), ...serverError } },
+    },
+    "/api/lessons": {
       post: {
         tags: ["Lessons"],
         summary: "Create a lesson",

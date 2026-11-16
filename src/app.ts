@@ -3,7 +3,7 @@ import swaggerUi from "swagger-ui-express";
 import { corsMiddleware } from "./config/index.js";
 import { openapiDocument } from "./docs/index.js";
 import { errorHandler, requestLogger } from "./middleware/index.js";
-import { aiRouter, lessonRouter, userRouter } from "./modules/index.js";
+import { aiRouter, lessonRouter, trackingRouter, userRouter } from "./modules/index.js";
 
 const app = express();
 
@@ -26,6 +26,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/lessons", lessonRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/tracking", trackingRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: "Route is not found" });
