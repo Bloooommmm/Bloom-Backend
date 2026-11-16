@@ -7,6 +7,7 @@ const router = Router();
 router.use(firebaseAuth);
 router.get("/periods", asyncHandler(trackingController.periods));
 router.post("/periods", asyncHandler(trackingController.createPeriod));
+router.patch("/periods/:id", asyncHandler(trackingController.finishPeriod));
 router.get("/moods", asyncHandler(trackingController.moods));
 router.put("/moods", asyncHandler(trackingController.upsertMood));
 export default router;
